@@ -1,0 +1,163 @@
+import math #This module is used to perform various mathematical tasks
+
+import numpy as np # NumPy is a python library used for working with arrays.
+#                    It also has functions for working in domain of linear algebra, fourier transform, and matrices.
+
+import matplotlib.pyplot as plt  # Matplotlib is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
+
+import random  #Functions in the random module depend on a pseudo-random number generator function random(), which generates a random float number between 0.0 and 1.0.
+
+
+#Speed of light
+c = 299792458
+
+def gamma(v):    #To calculate the gamma taking the speed in terms of c.
+    return float((1 / math.sqrt((1 - (v**2)))))
+
+def mtstoc(a):    # To convert the speeed that is in terms of meters per second into terms of c.
+    return float(a / c)
+
+def xlorentz(speed, x, t):  #To caluculate the lorentz transformation for space coordinates.
+    return float(gamma(speed) * (x - speed * t))
+
+def tlorentz(speed, x, t):  # To calculates the lorentz transformation for time coordinates.
+    return float(gamma(speed) * (t - speed * x))
+
+def timedialation(v, t):  # To caluculate the time dialation based on the velocity and time.
+    return float(gamma(v) * t)
+
+def lengthcontraction(v, h):   # To caluculate the length contraction based on the velocity and time.
+    return float(h / (gamma(v)))
+
+def time_sync_obj_length(l,v):
+    # To caluculate how much  objects clocks are not synchronised (the front and read end time dilation)
+    return (l**v)
+
+# For Minkowski Diagrams:
+def coords (t,uv,string1,tt,ov,string2):
+    y = np.arange(-(t**3),(t**3))
+    x = np.dot(uv,y)
+    yt = np.arange(-(tt**2),(tt**2))
+    xt = np.dot(ov,yt)
+    plt.style.use('grayscale')
+    plt.plot(x,y, label = string1 )
+    plt.plot(xt,yt, label = string2, marker = 'o')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.xlabel("Space coordinates (in light years)")
+    plt.ylabel("Time coordinates(in years)")
+    plt.title("Minkowski diagram wrt "+string1)
+    plt.show()
+
+ 
+ 
+if __name__=="__main__": 
+    # Input the Spacetime Coordinates of user and object observed    
+    print("Specify your spacetime coordinates below:")
+    x1 = float(input("x1="))
+    t1 = float(input("t1="))
+    print("\nEnter the objects spacetime coordinates below:")
+    x2 = float(input("x2="))
+    t2 = float(input("t2="))
+
+    #Input velocity of the object and caluculate the gamma factor:
+    print("\nEnter the velocity of the object wrt to you:")
+    print("If velocity is in meters per sec enter 0 or in terms of c enter 1")
+    d = int(input())
+    if d == 0:
+        print("\nEnter the velocity in terms of m/s :")
+        e = float(input())
+        print("\nVelocity converted in terms of c")
+        vo = mtstoc(e)
+        print(vo)
+        print("\nNote:")
+        print("The Lorentz factor or Lorentz term is the factor by which time, length, and relativistic mass change for an object while that object is moving. The expression appears in several equations in special relativity, and it arises in derivations of the Lorentz transformations.")
+        print("\nLorentz factor is:")
+        print(gamma(vo))
+    elif d == 1:
+        print("\nEnter the velocity in terms of c:")
+        vo = float(input())
+        print("\nNote:")
+        print("The Lorentz factor or Lorentz term is the factor by which time, length, and relativistic mass change for an object while that object is moving. The expression appears in several equations in special relativity, and it arises in derivations of the Lorentz transformations.")
+        print("Lorentz factor is:")
+        print(gamma(vo))
+
+    # Input the length to obtain the length contraction
+    print("\nIf the object observing has some length, enter 1")
+    print("If no, enter 0")
+    a = int(input())
+    if a==1:
+        print("\nEnter the length: ")
+        length_of_object = float(input("length of the object ="))
+        print("\nNote :")
+        print("Length contraction is the phenomenon that a moving object's length is measured to be shorter than its proper length, which is the length as measured in the object's own rest frame.")
+        print ("\nLength contraction obtained:")
+        print(lengthcontraction(vo,length_of_object))
+        print("\nThe front clock lag the rear clock by:")
+        print(time_sync_obj_length(length_of_object,vo))
+
+
+    # Caluculating the time dialation for the given time interval
+    print("\nNote :")
+    print("Time dilation is the lengthening of the time interval between two events for an observer in an inertial frame that is moving with respect to the rest frame of the events (in which the events occur at the same location).")
+    print ("\nTime dialation obtained:")
+    print(timedialation(vo,t1))
+
+    # Tranformation of objects coordinates wrt the user:
+    print("\nThe space coordinates of the object with respect to yours is:")
+    x2_transformed = xlorentz(vo,t1,x1)
+    print(x2_transformed)
+    print("\nThe time coordinates of the object with respect to yours is:")
+    t2_transformed = tlorentz(vo,t1,x1)
+    print(t2_transformed)
+    
+    # Tranformation of objects coordinates wrt the user:
+    print("\nThe space coordinates of the object with respect to object is:")
+    x1_transformed = xlorentz(-vo,t2,x2)
+    print(x1_transformed)
+    print("\nThe time coordinates of the object with respect to object is:")
+    t1_transformed = tlorentz(-vo,t2,x2)
+    print(t1_transformed)
+    
+    # Type the users name:
+    print("\nEnter your name:")
+    q = input()
+    
+    # The points where the user and object actually lie:
+    print("\nThe points on space-time graph where the user and object lie at that moment\n")
+    y = [x1,x2]
+    z = [t1,t2]
+    n = [q,'object']
+    
+    fig, ax = plt.subplots()
+    ax.scatter(z, y)
+
+    ax.annotate(n[0], (z[0], y[0]), xytext=(z[0]+0.05, y[0]+0.3), 
+        arrowprops=dict(facecolor='red', shrink=0.05))
+
+    ax.annotate(n[1], (z[1], y[1]), xytext=(z[1]-0.05, y[1]-0.3), 
+                bbox=dict(boxstyle="round", alpha=0.1), 
+        arrowprops = dict(arrowstyle="simple"))
+    plt.xlabel("Space Coordinates(in light years)")
+    plt.ylabel("Time Coordinates(in years)")
+    plt.title("The points where the user and the object actually lie")
+    plt.show()
+
+    
+    # What is Minkowski diagram ?
+    print("\nNote:")
+    print("The Minkowski diagram, also known as a spacetime diagram, was developed in 1908 by Hermann Minkowski and provides an illustration of the properties of space and time in the special theory of relativity")
+
+    # Obtaining the Space Time Diagram wrt the user:
+    
+    print("\n Minkowski diagram wrt to you is :\n")
+
+    # Space-Time Diagram wrt user:
+    coords(t1,0,q,t2_transformed,vo,'object')
+    
+    print("\n\n Minkowski diagram wrt to object is :\n")
+    
+    # Space-Time Diagram wrt object: 
+    coords(t2,0,"object",t1_transformed,-vo,q)
+
